@@ -1,0 +1,61 @@
+【Scrapy入门】
+	* scrapy是框架，类似于车子，学会开车
+	* 采用异步框架，实现高效率的网络采集
+	* 最强大的框架，没有之一
+【Scrapy安装】
+
+【Scrapy入门实战案例】
+	采集目标：  采集西刺网的ip代理，包括IP PORT
+
+	1.创建项目
+		scrapy startproject xxx（项目名字）
+	2.创建爬虫
+		scrapy genspider 爬虫名字 网站域名
+
+		注意：
+		*爬虫名字不要和项目名字一样
+		*网站域名是允许爬虫采集的域名
+	【解释爬虫文件】
+		import scrapy #导入scrapy
+		#创建爬虫类，并且集成自scrapy.Spider -->最基础的类，另外几个类都是继承自这个类
+		class XicidailiSpider(scrapy.Spider):
+			name = 'xicidaili'  #爬虫名字 -->必须唯一
+			allowed_domains = ['xicidaili.com']  #允许采集的域名
+			start_urls = ['http://xicidaili.com/']  #开始采集的网站
+
+			#解析相应数据，提取数据或者网址等,reponse就是网页源码HTML
+			def parse(self,response):
+				
+				#提取数据
+				#提取IP PORT
+				selectors = response.xpath('表达式')
+				#
+	3.分析网站
+		*提取数据
+			- 正则表达式（基础 必会 难掌握）
+			- XPath -->从HTML中提取数据语法
+			- CSS -->从HTML中提取数据语法
+
+			- reponse.xpath(xpath语法).get()
+
+			- get()是得到一个元素
+			- getall()得到所有元素
+
+	4.运行爬虫
+		*scrapy crawl 爬虫名字
+
+		*翻页操作
+			next_page = response.xpath('下一页对应的网络表达式').get()
+			#如果有下一页操作
+			if next_page:
+				print(next_page)
+				#拼接网址
+				next_url = response.urljoin(next_page)
+				#发出请求，Request；callback是回调函数，就是将请求得到的响应交给回调函数处理
+				yield scrapy.Request(next_url,callback = self.parse) #生成器
+
+		Request() 发出请求，类似于requests.get()
+		callback 是将发出去的请求得到的响应交给回调函数处理
+		注意：回调函数不用（）
+
+
